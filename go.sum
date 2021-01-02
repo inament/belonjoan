@@ -1,0 +1,8 @@
+github.com/bagus2x/gemux v0.1.1 h1:SljZYU/AvnlMck7IhnXCocpIqRPp/2SnECmHBnljISc=
+github.com/bagus2x/gemux v0.1.1/go.mod h1:BYmt+UvzCb6XXKZ50ZsznhiiD2Ki5vn34jULDJU3m5o=
+github.com/bagus2x/sumux v0.1.1 h1:OIn8CK1MqHwArKPGqRVrHcs1RGCUhrwHULNuc4plHuQ=
+github.com/bagus2x/sumux v0.1.1/go.mod h1:QInebOeyYrRm/1276UhGuAWIX+1K6MLrVZVT0SvlcAM=
+github.com/bagus2x/sumux v0.1.2 h1:P7d35Rooan2VwkfwRKKj3REFkeydkwYnQoeEgH04ZMw=
+github.com/bagus2x/sumux v0.1.2/go.mod h1:QInebOeyYrRm/1276UhGuAWIX+1K6MLrVZVT0SvlcAM=
+github.com/mattn/go-sqlite3 v1.14.6 h1:dNPt6NO46WmLVt2DLNpwczCmdV5boIZ6g/tlDrlRUbg=
+github.com/mattn/go-sqlite3 v1.14.6/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=

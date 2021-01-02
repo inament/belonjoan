@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="icon" href="https://www.google.com/s2/favicons?domain=stackoverflow.com" type="image/gif" sizes="16x16">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+        rel="stylesheet">
+    <title>BELONJOAN</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: 'Lato', sans-serif;
+        }
+
+        body {
+            display: grid;
+            background: #64b5f6;
+            height: 100vh;
+            place-items: center;
+            padding: 0 8px;
+        }
+
+        .container {
+            border-radius: 20px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 95vh;
+            background: #fff;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .container th {
+            position: sticky;
+            top: 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th {
+            background: #455a64;
+            color: #fff;
+        }
+
+        td,
+        th {
+            padding: 10px;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background-color: #eceff1;
+        }
+
+        tr {
+            transition: all .2s;
+        }
+
+        tr:hover {
+            background-color: #cfd8dc;
+            cursor: pointer;
+        }
+
+        #btn-add-modal {
+            background: #263238;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all .8s;
+        }
+
+        #btn-add-modal:hover {
+            background: #323f46;
+        }
+
+        #btn-add-modal:active {
+            transform: scale(1.1);
+        }
+
+        .modal-container {
+            position: absolute;
+            z-index: 888;
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            place-items: center;
+            box-sizing: border-box;
+            left: 0;
+            top: 0;
+        }
+
+        .modal {
+            max-width: 400px;
+            width: 100%;
+            background: #fff;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.22);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal input {
+            border: none;
+            margin-bottom: 8px;
+            background: #cfd8dc;
+            padding: 8px 4px;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .btn-wrapper {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-wrapper button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: 800;
+        }
+
+        .btn-wrapper button:hover {
+            background: #cfd8dc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NAMA</th>
+                    <th>HARGA</th>
+                </tr>
+            </thead>
+            <tbody id="bodytable">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal-container add-item hidden">
+        <form class="modal" onsubmit="submitBelonjoan(event)">
+            <input type="text" name="item_name" placeholder="name">
+            <input type="text" name="item_price" placeholder="price">
+            <div class="btn-wrapper">
+                <button type="button" class="btn-cancel">Cancel</button>
+                <button type="submit" class="btn-add-item">Add</button>
+            </div>
+        </form>
+    </div>
+
+    <button id="btn-add-modal">
+        +
+    </button>
+    <script>
+
+        async function getBelonjoan() {
+            const res = await fetch('/api/v1/belonjoan')
+            const json = await res.json()
+            return json
+        }
+
+        async function deleteBelonjoan(id) {
+            const res = await fetch(`/api/v1/belonjoan/${id}`, {
+                method: 'DELETE'
+            })
+            const json = await res.json()
+            return json
+        }
+
+        async function renderBelonjoan() {
+            const bodytable = document.getElementById('bodytable')
+            const belonjoans = await getBelonjoan()
+            bodytable.innerHTML = ''
+            let total = 0;
+            belonjoans.forEach((item, index) => {
+                const tr = document.createElement('tr')
+                tr.ondblclick = async (ev) => {
+                    const del = await deleteBelonjoan(item.item_id)
+                    if (del?.error) {
+                        alert(del.error)
+                        return
+                    }
+                    renderBelonjoan();
+                }
+                for (i in item) {
+                    const td = document.createElement('td')
+                    const text = document.createTextNode(i === 'item_id' ? index + 1 : item[i])
+                    td.appendChild(text)
+                    tr.appendChild(td)
+                }
+                bodytable.appendChild(tr)
+                total += parseFloat(item.price)
+            })
+            bodytable.insertAdjacentHTML('beforeend', `
+                <tr>
+                    <td></td>
+                    <td><b>TOTAL</b></td>
+                    <td>${total}</td>
+                </tr>
+            `)
+
+        }
+
+        async function postBelonjoan(data) {
+            const response = await fetch('/api/v1/belonjoan', {
+                method: 'POST',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            return response.json()
+        }
+
+        async function submitBelonjoan(e) {
+            e.preventDefault()
+            const itemName = e.target.item_name.value
+            const itemPrice = e.target.item_price.value
+            const res = await postBelonjoan({ name: itemName, price: parseFloat(itemPrice) || 0 })
+            const modal = document.querySelector('.modal-container.add-item')
+            if (res?.error) {
+                alert(res.error)
+                return
+            }
+            renderBelonjoan()
+            e.target.item_name.value = ''
+            e.target.item_price.value = ''
+            modal.classList.toggle('hidden')
+
+        }
+
+        function showModalAddBelonjoan() {
+            const toggleShowModal = document.getElementById('btn-add-modal')
+            const modal = document.querySelector('.modal-container.add-item')
+            const btnCancel = document.querySelector('.btn-cancel')
+            toggleShowModal.onclick = () => {
+                modal.classList.toggle('hidden')
+            }
+            btnCancel.onclick = () => {
+                modal.classList.toggle('hidden')
+            }
+        }
+
+        document.body.onload = async () => {
+            renderBelonjoan()
+            showModalAddBelonjoan()
+        }
+    </script>
+</body>
+
+</html>
